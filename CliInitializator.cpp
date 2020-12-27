@@ -44,8 +44,7 @@ void CliInitializator::loadCommands() {
 	ifstream* commandsLoader = new ifstream("commands.conf", ios::in);
 	char singleCharacter;
 	string newWord = "";
-	int newId;
-	string commandName, commandDescription;
+	CommandEntity* tmp = nullptr;
 	int currentMode = (int) loadingMode::id;
 	if (commandsLoader->is_open()) {
 		
@@ -55,23 +54,25 @@ void CliInitializator::loadCommands() {
 			}
 			else {
 				if (currentMode == (int) loadingMode::id) {
-					newId = (stoi(newWord));
+					tmp = new CommandEntity();
+					tmp->setCommandId(stoi(newWord));
 					currentMode = (int)loadingMode::commandName;
 				}
 				else if (currentMode == (int) loadingMode::commandName) {
-					commandName = newWord;
+					tmp->setCommandName(newWord);
 					currentMode = (int)loadingMode::commandDescription;
 				}
 				else if (currentMode == (int)loadingMode::commandDescription) {
-					commandDescription = newWord;
-					saveCommand(newId, commandName, commandDescription);
+					tmp->setCommandDescription(newWord);
+					saveCommand(tmp);
 					currentMode = (int)loadingMode::id;
 				}
 				newWord = "";
 				
 			}
 		}
-		saveCommand(newId, commandName, commandDescription);
+		tmp->setCommandDescription(newWord);
+		saveCommand(tmp);
 		commandsLoader->close();
 		delete(commandsLoader);
 	}
@@ -81,28 +82,28 @@ void CliInitializator::loadCommands() {
 	}
 }
 
-void CliInitializator::saveCommand(int newId, string newCommandName, string newCommandDescription) {
-	if (commands == NULL) {
-		commands = new CommandEntity(newId, newCommandName, newCommandDescription, NULL);
+void CliInitializator::saveCommand(CommandEntity* newCommand) {
+	if (commands == nullptr) {
+		commands = newCommand;
 	}
 	else {
 		CommandEntity* tmp = commands;
-		while (commands->next != NULL) {
-			commands = commands->next;
+		while (commands->getNext() != nullptr) {
+			commands = commands->getNext();
 		}
-		commands->next = new CommandEntity(newId, newCommandName, newCommandDescription, NULL);
+		commands->setNext(newCommand);
 		commands = tmp;
 	}
 }
 
 void CliInitializator::printAllCommands() {
 	CommandEntity* tmp = commands;
-	while (commands->next != NULL) {
-		cout << commands->commandName << endl;
+	while (commands->getNext() != nullptr) {
+		cout << commands->getCommandName() << endl;
 		cout << commands->getCommandDescription() << endl;
-		commands = commands->next;
+		commands = commands->getNext();
 	}
-	cout << commands->commandName << endl;
+	cout << commands->getCommandName() << endl;
 	cout << commands->getCommandDescription() << endl;
 	commands = tmp;
 }
