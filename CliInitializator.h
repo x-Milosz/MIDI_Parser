@@ -10,7 +10,7 @@ private:
 	bool runCommand(std::string input);
 	int analyzeInput(std::string input);
 	void loadCommands();
-	void saveCommand(CommandEntity* commandEntity);
+	void saveCommand(int newId, std::string newCommandName, std::string newCommandDescription);
 	void printAllCommands();
 	CommandEntity* commands;
 };

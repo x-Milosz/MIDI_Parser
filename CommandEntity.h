@@ -11,9 +11,10 @@ public:
 	void setCommandDescription(std::string commandDescription);
 	void setCommandId(int newId);
 	void setNext(CommandEntity* next);
-private:
 	std::string commandName;
 	std::string commandDescription;
 	int commandId;
 	CommandEntity* next;
+private:
+	
 };
