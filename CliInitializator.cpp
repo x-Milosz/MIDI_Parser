@@ -52,7 +52,10 @@ bool CliInitializator::analyzeInput(string input) {
 		}
 		break;
 	default:
-		cout << "Undefined command \"" + input.substr(0, input.find(" ")) + "\", type help to list all commands." << endl;;
+		if (input.substr(0, input.find(" ")).size() != 0) {
+			cout << "Undefined command \"" + input.substr(0, input.find(" ")) + "\", type help to list all commands." << endl;
+		}
+		
 		break;
 	}
 
@@ -103,7 +106,7 @@ void CliInitializator::loadCommands() {
 		delete(commandsLoader);
 	}
 	else {
-		cout << "Failed when tried to open the commands.conf file!" << endl;
+		cout << "Failed to open the commands.conf file!" << endl;
 		exit(1);
 	}
 }
