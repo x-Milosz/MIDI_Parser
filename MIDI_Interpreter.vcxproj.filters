@@ -13,16 +13,25 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Pliki źródłowe\Play command">
+      <UniqueIdentifier>{235899bc-26cc-4eb7-9e8c-21ff6baec104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\Main and CLI">
+      <UniqueIdentifier>{38c8dcb1-2184-4aa2-bc91-b8ad3bbd5916}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CliInitializator.cpp">
-      <Filter>Pliki źródłowe</Filter>
+    <ClCompile Include="Play.cpp">
+      <Filter>Pliki źródłowe\Play command</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Pliki źródłowe</Filter>
+      <Filter>Pliki źródłowe\Main and CLI</Filter>
     </ClCompile>
     <ClCompile Include="CommandEntity.cpp">
-      <Filter>Pliki źródłowe</Filter>
+      <Filter>Pliki źródłowe\Main and CLI</Filter>
+    </ClCompile>
+    <ClCompile Include="CliInitializator.cpp">
+      <Filter>Pliki źródłowe\Main and CLI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,6 +42,9 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="Play.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

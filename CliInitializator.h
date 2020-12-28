@@ -7,11 +7,13 @@ public:
 private:
 	void mainLoop();
 	void setProgramsVariables();
-	bool runCommand(std::string input);
-	int analyzeInput(std::string input);
+	void runCommand(std::string input);
+	bool analyzeInput(std::string input);
 	void loadCommands();
 	void saveCommand(CommandEntity* newCommand);
 	void printAllCommands();
+	void printSelectedCommand(std::string commandName);
+	int* checkCommandId(std::string usersCommandName);
 	CommandEntity* commands;
 };
 

@@ -143,10 +143,12 @@
     <ClCompile Include="CliInitializator.cpp" />
     <ClCompile Include="CommandEntity.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Play.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CliInitializator.h" />
     <ClInclude Include="CommandEntity.h" />
+    <ClInclude Include="Play.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
