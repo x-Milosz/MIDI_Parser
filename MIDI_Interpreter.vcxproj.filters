@@ -39,6 +39,9 @@
     <ClCompile Include="CliInitializator.cpp">
       <Filter>Pliki źródłowe\Main and CLI</Filter>
     </ClCompile>
+    <ClCompile Include="MidiPiece.cpp">
+      <Filter>Pliki źródłowe\Play command</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -51,6 +54,9 @@
       <Filter>Pliki nagłówkowe\Main and CLI</Filter>
     </ClInclude>
     <ClInclude Include="Play.h">
+      <Filter>Pliki nagłówkowe\Play command</Filter>
+    </ClInclude>
+    <ClInclude Include="MidiPiece.h">
       <Filter>Pliki nagłówkowe\Play command</Filter>
     </ClInclude>
   </ItemGroup>

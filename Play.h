@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<fstream>
+#include "MidiPiece.h"
 class Play {
 public:
 	Play(std::string* fileLocation) {
@@ -14,4 +15,5 @@ private:
 	std::string* fileLocation;
 
 	bool validateFile(std::ifstream* stream);
+	void play(MidiPiece* midi);
 };

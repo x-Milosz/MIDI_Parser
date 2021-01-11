@@ -1,13 +1,14 @@
 #include<iostream>
 #include<fstream>
 #include "Play.h"
+#include "MidiPiece.h"
 using namespace std;
 
 void Play::run() {
-	ifstream* stream = new ifstream(*fileLocation, ios::in | ios::binary);
+	MidiPiece* midi = new MidiPiece(fileLocation);
 	
-	if (validateFile(stream)) {
-
+	if (validateFile(midi->getStream())) {
+		play(midi);
 	}
 }
 
@@ -25,4 +26,8 @@ bool Play::validateFile(ifstream* stream) {
 		return false;
 	}
 	return true;
+}
+
+void Play::play(MidiPiece* midi) {
+	
 }
