@@ -67,8 +67,8 @@ void Play::play(MidiPiece* midiFile) {
 
 		while (midiFile->getStream()->peek() != EOF) {
 			if (*isTrackOver) {
-				*midiFile->read4();
-				lenghtOfChunk = midiFile->read4();
+				midiFile->read4();
+				*lenghtOfChunk = *midiFile->read4();
 				*isTrackOver = false;
 			}
 
@@ -82,6 +82,7 @@ void Play::play(MidiPiece* midiFile) {
 					currentDeltaTime[*counter] = *midiFile->read1();
 				}
 			}
+			delay(midiFile, currentDeltaTime, counter);
 
 			*currentlyExaminedByte = *midiFile->read1();
 
@@ -123,7 +124,7 @@ void Play::play(MidiPiece* midiFile) {
 					}
 				}
 			}
-			// channel events
+			// Channel events
 			else {
 				*msg = 0;
 				if ((*currentlyExaminedByte >> 4) == noteOff || (*currentlyExaminedByte >> 4) == noteOn || (*currentlyExaminedByte >> 4) == noteAftertouch
@@ -139,13 +140,25 @@ void Play::play(MidiPiece* midiFile) {
 					midiOutShortMsg(*toSendInterface, *msg);
 				}
 			}
-
-			delay(midiFile, currentDeltaTime, counter);
+			
 		}
 		midiOutClose(*toSendInterface);
 	}
 }
 
-void Play::delay(MidiPiece* midi, uint8_t* currentDeltaTime, uint8_t* counter) {
-
+void Play::delay(MidiPiece* midiFile, uint8_t* currentDeltaTime, uint8_t* counter) {
+	// For metrical timing
+	if (currentDeltaTime[0] == 0) {
+		return;
+	}
+	else if (*midiFile->getFormat() < 128) {
+		uint32_t* deltaTime = new uint32_t(currentDeltaTime[0]);
+		for (int i = 0; i <= *counter; i++) {
+			*deltaTime = (*deltaTime << i * 7) | currentDeltaTime[i];
+		}
+		double* t1 = new double(*deltaTime / (double) *midiFile->getDivision());
+		*t1 = *t1 * *midiFile->getMicrosecondsPerQuaterNote();
+		*t1 = *t1 / 1000;
+		Sleep(*t1);
+	}
 }

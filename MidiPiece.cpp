@@ -9,7 +9,7 @@ MidiPiece::MidiPiece(string* fileName) {
 	this->ntrks = nullptr;
 	this->division = nullptr;
 	this->microsecondsPerQuarterNote = new uint32_t(120);
-	this->timeSignaure = nullptr;
+	this->timeSignaure = new TimeSignature(new uint8_t(4), new uint8_t(2), new uint8_t(0), new uint8_t(0));
 	this->smpteOffset = nullptr;
 }
 
@@ -63,7 +63,7 @@ uint16_t* MidiPiece::getDivision() {
 }
 
 uint32_t* MidiPiece::getMicrosecondsPerQuaterNote() {
-	return nullptr;
+	return microsecondsPerQuarterNote;
 }
 
 TimeSignature* MidiPiece::getTimeSignature() {
