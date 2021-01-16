@@ -121,6 +121,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,13 +146,18 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MidiPiece.cpp" />
     <ClCompile Include="Play.cpp" />
+    <ClCompile Include="SmpteOffset.cpp" />
+    <ClCompile Include="TimeSignature.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CliInitializator.h" />
     <ClInclude Include="CommandEntity.h" />
     <ClInclude Include="MidiPiece.h" />
+    <ClInclude Include="MidiSpecificEnums.h" />
     <ClInclude Include="Play.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SmpteOffset.h" />
+    <ClInclude Include="TimeSignature.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MIDI_Parser.rc" />

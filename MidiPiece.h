@@ -1,6 +1,9 @@
 #pragma once
 #include<iostream>
 #include<fstream>
+#include "TimeSignature.h"
+#include "SmpteOffset.h"
+
 class MidiPiece {
 public:
 	MidiPiece(std::string* fileName);
@@ -10,10 +13,17 @@ public:
 	void setFormat(uint16_t* newFormat);
 	void setNtrks(uint16_t* newNtrks);
 	void setDivision(uint16_t* newDivision);
+	void setMicrosecnodsPerQuaterNote(uint32_t* newMicrosecondsPerQuarterNote);
+	void setTimeSignature(TimeSignature* newTimeSignaure);
+	void setSmpteOffset(SmpteOffset* newSmpteOffset);
+
 	std::ifstream* getStream();
 	uint16_t* getFormat();
 	uint16_t* getNtrks();
 	uint16_t* getDivision();
+	uint32_t* getMicrosecondsPerQuaterNote();
+	TimeSignature* getTimeSignature();
+	SmpteOffset* getSmpteOffset();
 
 	uint8_t* read1();
 	uint16_t* read2();
@@ -23,5 +33,8 @@ private:
 	uint16_t* format;
 	uint16_t* ntrks;
 	uint16_t* division;
+	uint32_t* microsecondsPerQuarterNote;
+	TimeSignature* timeSignaure;
+	SmpteOffset* smpteOffset;
 };
 

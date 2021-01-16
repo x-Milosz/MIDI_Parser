@@ -14,6 +14,8 @@ public:
 private:
 	std::string* fileLocation;
 
-	bool validateFile(std::ifstream* stream);
+	bool validateFile(MidiPiece* midi);
 	void play(MidiPiece* midi);
+	void delay(MidiPiece* midi, uint8_t* currentDeltaTime, uint8_t* counter);
+	
 };
