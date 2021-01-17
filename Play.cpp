@@ -2,7 +2,7 @@
 #include <mmeapi.h>
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <stdlib.h>
 #include "MidiSpecificEnums.h"
 #include "Play.h"
 #include "MidiPiece.h"
@@ -66,6 +66,7 @@ void Play::play(MidiPiece* midiFile) {
 		uint32_t* tmp = new uint32_t();
 
 		while (midiFile->getStream()->peek() != EOF) {
+			//system("CLS");
 			if (*isTrackOver) {
 				midiFile->read4();
 				*lenghtOfChunk = *midiFile->read4();
@@ -131,12 +132,14 @@ void Play::play(MidiPiece* midiFile) {
 					|| (*currentlyExaminedByte >> 4) == controller || (*currentlyExaminedByte >> 4) == pitchBend) {
 					*msg = *currentlyExaminedByte | (*midiFile->read1() << 8);
 					*msg = *msg | (*midiFile->read1() << 16);
-					
+					cout << "Sended midi msg: ";
+					cout << hex << *msg << endl;
 					midiOutShortMsg(*toSendInterface, *msg);
 				}
 				else if ((*currentlyExaminedByte >> 4) == programChange || (*currentlyExaminedByte >> 4) == channelAfterTouch) {
 					*msg = *currentlyExaminedByte | (*midiFile->read1() << 8);
-					int i = 0;
+					cout << "Sended midi msg: ";
+					cout << hex << *msg << endl;
 					midiOutShortMsg(*toSendInterface, *msg);
 				}
 			}
@@ -149,16 +152,23 @@ void Play::play(MidiPiece* midiFile) {
 void Play::delay(MidiPiece* midiFile, uint8_t* currentDeltaTime, uint8_t* counter) {
 	// For metrical timing
 	if (currentDeltaTime[0] == 0) {
+		cout << "Delta time: 0" << endl;
+		cout << "Calculated sleep : 0" << endl;
 		return;
 	}
 	else if (*midiFile->getFormat() < 128) {
+		
 		uint32_t* deltaTime = new uint32_t(currentDeltaTime[0]);
 		for (int i = 0; i <= *counter; i++) {
 			*deltaTime = (*deltaTime << i * 7) | currentDeltaTime[i];
+			printf("currentDeltaTime[%d] = %d\n", i, currentDeltaTime[i]);
 		}
 		double* t1 = new double(*deltaTime / (double) *midiFile->getDivision());
 		*t1 = *t1 * *midiFile->getMicrosecondsPerQuaterNote();
 		*t1 = *t1 / 1000;
-		Sleep(*t1);
+		uint32_t  test = *t1;
+		cout << "Delta time: " + to_string(*deltaTime) << endl;
+		cout << "Calculated sleep : " + to_string(test) << endl;
+		Sleep(test);
 	}
 }
