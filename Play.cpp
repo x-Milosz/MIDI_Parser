@@ -85,7 +85,7 @@ void Play::play(MidiPiece* midiFile) {
 				}
 
 				// Calculate delta time
-				currentDeltaTime[0] = *midiFile->read1();
+				currentDeltaTime[0] = *midiFile->read1();a// lenght is fixed - 5;
 
 
 				*currentlyExaminedByte = *midiFile->read1();
@@ -95,15 +95,18 @@ void Play::play(MidiPiece* midiFile) {
 					*currentlyExaminedByte = *midiFile->read1();
 
 					if (*currentlyExaminedByte == smpteOffset) {
-						midiFile->read1(); // lenght is fixed - 5;
+						// lenght is fixed - 5;
+						midiFile->read1(); 
 						midiFile->setSmpteOffset(new SmpteOffset(midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1()));
 					}
 					else if (*currentlyExaminedByte == timeSignature) {
-						midiFile->read1(); // lenght is fixed - 4
+						// lenght is fixed - 4
+						midiFile->read1(); 
 						midiFile->setTimeSignature(new TimeSignature(midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1()));
 					}
 					else if (*currentlyExaminedByte == setTempo) {
-						midiFile->read1(); // lenght is fixed - 3
+						// lenght is fixed - 3
+						midiFile->read1();
 						uint32_t* microsecondsPerQuarterNote = new uint32_t(0);
 						uint16_t* first2Bytes = new uint16_t(*midiFile->read2());
 						uint8_t* secondByte = new uint8_t(*midiFile->read1());
@@ -147,9 +150,6 @@ void Play::play(MidiPiece* midiFile) {
 			}
 			
 			for(int i = 0; i < *midiFile->getNtrks() - 1; i++){
-				if (i == 7) {
-					int z = 2;
-				}
 				midiTracks[i] = new MidiTrack(fileLocation, byteCounter, midiFile->getDivision(), midiFile->getMicrosecondsPerQuaterNote(), toSendInterface);
 				for (int y = 0; y < *lenghtOfChunk; y++) {
 					midiFile->read1();
@@ -170,7 +170,7 @@ void Play::play(MidiPiece* midiFile) {
 
 void Play::runOtherTracks(MidiTrack** midiTracks, MidiPiece* midiFile ) {
 	vector <thread*> ts;
-	for (size_t i = 0; i < *midiFile->getNtrks() - 2; i++) {
+	for (size_t i = 0; i < *midiFile->getNtrks() - 1; i++) {
 		thread* t = new thread(&MidiTrack::start, midiTracks[i], new uint8_t(i));
 		ts.push_back(t);
 	}

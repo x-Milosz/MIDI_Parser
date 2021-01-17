@@ -8,7 +8,7 @@ MidiPiece::MidiPiece(string* fileName) {
 	this->format = nullptr;
 	this->ntrks = nullptr;
 	this->division = nullptr;
-	this->microsecondsPerQuarterNote = new uint32_t(120);
+	this->microsecondsPerQuarterNote = new uint32_t(700000);
 	this->timeSignaure = new TimeSignature(new uint8_t(4), new uint8_t(2), new uint8_t(0), new uint8_t(0));
 	this->smpteOffset = nullptr;
 }
