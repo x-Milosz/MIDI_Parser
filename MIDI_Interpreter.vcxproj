@@ -145,6 +145,7 @@
     <ClCompile Include="CommandEntity.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MidiPiece.cpp" />
+    <ClCompile Include="MidiTrack.cpp" />
     <ClCompile Include="Play.cpp" />
     <ClCompile Include="SmpteOffset.cpp" />
     <ClCompile Include="TimeSignature.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="CommandEntity.h" />
     <ClInclude Include="MidiPiece.h" />
     <ClInclude Include="MidiSpecificEnums.h" />
+    <ClInclude Include="MidiTrack.h" />
     <ClInclude Include="Play.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SmpteOffset.h" />

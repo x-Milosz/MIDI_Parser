@@ -3,9 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <thread>
+#include <vector>
 #include "MidiSpecificEnums.h"
 #include "Play.h"
 #include "MidiPiece.h"
+#include "MidiTrack.h"
 
 using namespace std;
 
@@ -50,6 +53,8 @@ void Play::play(MidiPiece* midiFile) {
 	midiFile->setNtrks(midiFile->read2());
 	midiFile->setDivision(midiFile->read2());
 
+	MidiTrack** midiTracks = new MidiTrack*[*midiFile->getNtrks() - 1];
+
 
 	if (*midiFile->getFormat() == 1 || *midiFile->getFormat() == 0) {
 
@@ -60,115 +65,119 @@ void Play::play(MidiPiece* midiFile) {
 
 		uint8_t* currentlyExaminedByte = new uint8_t;
 		uint8_t* currentDeltaTime = new uint8_t[4];
-		uint8_t* counter = new uint8_t;
+		uint32_t* byteCounter = new uint32_t(22);
 
 		uint32_t* msg = new uint32_t;
 		uint32_t* tmp = new uint32_t();
 
-		while (midiFile->getStream()->peek() != EOF) {
-			//system("CLS");
-			if (*isTrackOver) {
-				midiFile->read4();
-				*lenghtOfChunk = *midiFile->read4();
-				*isTrackOver = false;
-			}
-
-					// Calculate delta time
-			currentDeltaTime[0] = *midiFile->read1();
-			*counter = 0;
-			while (currentDeltaTime[*counter] >= 128) {
-				currentDeltaTime[*counter] = currentDeltaTime[*counter] - 128;
-				if (*counter < 4) {
-					*counter += 1;
-					currentDeltaTime[*counter] = *midiFile->read1();
+		uint8_t* trackCount = new uint8_t(0);	
+			while (*trackCount < 2) {
+				if (*isTrackOver) {
+					midiFile->read4();
+					*lenghtOfChunk = *midiFile->read4();
+					*isTrackOver = false;
+					*byteCounter += *lenghtOfChunk;
+					*trackCount += 1;
+					if (*trackCount == 2) {
+						*byteCounter += 8;
+						break;
+					}
 				}
-			}
-			delay(midiFile, currentDeltaTime, counter);
 
-			*currentlyExaminedByte = *midiFile->read1();
+				// Calculate delta time
+				currentDeltaTime[0] = *midiFile->read1();
 
-			// Meta events
-			if (*currentlyExaminedByte == 0xFF) {
+
 				*currentlyExaminedByte = *midiFile->read1();
 
-				if (*currentlyExaminedByte == smpteOffset) {
-					midiFile->read1(); // lenght is fixed - 5;
-					midiFile->setSmpteOffset(new SmpteOffset(midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1()));
-				}
-				else if (*currentlyExaminedByte == timeSignature) {
-					midiFile->read1(); // lenght is fixed - 4
-					midiFile->setTimeSignature(new TimeSignature(midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1()));
-				}
-				else if (*currentlyExaminedByte == setTempo) {
-					midiFile->read1(); // lenght is fixed - 3
-					uint32_t* microsecondsPerQuarterNote = new uint32_t(0);
-					uint16_t* first2Bytes = new uint16_t(*midiFile->read2());
-					uint8_t* secondByte = new uint8_t(*midiFile->read1());
-					*microsecondsPerQuarterNote = *first2Bytes;
-					*microsecondsPerQuarterNote = (*microsecondsPerQuarterNote << 8) | *secondByte;
-					midiFile->setMicrosecnodsPerQuaterNote(microsecondsPerQuarterNote);
-					delete(first2Bytes, secondByte);
-				}
-				else if (*currentlyExaminedByte == keySignature) {
-					midiFile->read1(); // lenght is fixed - 2
-					keySignatureOfTrack = midiFile->read2();
-				}
-				else if (*currentlyExaminedByte == endOfTrack) {
-					midiFile->read1();
-					*isTrackOver = true;
+				// Meta events
+				if (*currentlyExaminedByte == 0xFF) {
+					*currentlyExaminedByte = *midiFile->read1();
+
+					if (*currentlyExaminedByte == smpteOffset) {
+						midiFile->read1(); // lenght is fixed - 5;
+						midiFile->setSmpteOffset(new SmpteOffset(midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1()));
 					}
-				else {
-					// represents other, unimplemented meta events
-					*tmp = *midiFile->read1();
-					for (int i = 0; i < *tmp; i++) {
+					else if (*currentlyExaminedByte == timeSignature) {
+						midiFile->read1(); // lenght is fixed - 4
+						midiFile->setTimeSignature(new TimeSignature(midiFile->read1(), midiFile->read1(), midiFile->read1(), midiFile->read1()));
+					}
+					else if (*currentlyExaminedByte == setTempo) {
+						midiFile->read1(); // lenght is fixed - 3
+						uint32_t* microsecondsPerQuarterNote = new uint32_t(0);
+						uint16_t* first2Bytes = new uint16_t(*midiFile->read2());
+						uint8_t* secondByte = new uint8_t(*midiFile->read1());
+						*microsecondsPerQuarterNote = *first2Bytes;
+						*microsecondsPerQuarterNote = (*microsecondsPerQuarterNote << 8) | *secondByte;
+						midiFile->setMicrosecnodsPerQuaterNote(microsecondsPerQuarterNote);
+						delete(first2Bytes, secondByte);
+					}
+					else if (*currentlyExaminedByte == keySignature) {
+						midiFile->read1(); // lenght is fixed - 2
+						keySignatureOfTrack = midiFile->read2();
+					}
+					else if (*currentlyExaminedByte == endOfTrack) {
 						midiFile->read1();
+						*isTrackOver = true;
+					}
+					else {
+						// represents other, unimplemented meta events
+						*tmp = *midiFile->read1();
+						for (int i = 0; i < *tmp; i++) {
+							midiFile->read1();
+						}
 					}
 				}
-			}
-			// Channel events
-			else {
-				*msg = 0;
-				if ((*currentlyExaminedByte >> 4) == noteOff || (*currentlyExaminedByte >> 4) == noteOn || (*currentlyExaminedByte >> 4) == noteAftertouch
-					|| (*currentlyExaminedByte >> 4) == controller || (*currentlyExaminedByte >> 4) == pitchBend) {
-					*msg = *currentlyExaminedByte | (*midiFile->read1() << 8);
-					*msg = *msg | (*midiFile->read1() << 16);
-					cout << "Sended midi msg: ";
-					cout << hex << *msg << endl;
-					midiOutShortMsg(*toSendInterface, *msg);
-				}
-				else if ((*currentlyExaminedByte >> 4) == programChange || (*currentlyExaminedByte >> 4) == channelAfterTouch) {
-					*msg = *currentlyExaminedByte | (*midiFile->read1() << 8);
-					cout << "Sended midi msg: ";
-					cout << hex << *msg << endl;
-					midiOutShortMsg(*toSendInterface, *msg);
+				// Channel events
+				else {
+					*msg = 0;
+					if ((*currentlyExaminedByte >> 4) == noteOff || (*currentlyExaminedByte >> 4) == noteOn || (*currentlyExaminedByte >> 4) == noteAftertouch
+						|| (*currentlyExaminedByte >> 4) == controller || (*currentlyExaminedByte >> 4) == pitchBend) {
+						*msg = *currentlyExaminedByte | (*midiFile->read1() << 8);
+						*msg = *msg | (*midiFile->read1() << 16);
+
+						midiOutShortMsg(*toSendInterface, *msg);
+					}
+					else if ((*currentlyExaminedByte >> 4) == programChange || (*currentlyExaminedByte >> 4) == channelAfterTouch) {
+						*msg = *currentlyExaminedByte | (*midiFile->read1() << 8);
+
+						midiOutShortMsg(*toSendInterface, *msg);
+					}
 				}
 			}
 			
-		}
+			for(int i = 0; i < *midiFile->getNtrks() - 1; i++){
+				if (i == 7) {
+					int z = 2;
+				}
+				midiTracks[i] = new MidiTrack(fileLocation, byteCounter, midiFile->getDivision(), midiFile->getMicrosecondsPerQuaterNote(), toSendInterface);
+				for (int y = 0; y < *lenghtOfChunk; y++) {
+					midiFile->read1();
+				}
+				if (i != *midiFile->getNtrks() - 2) {
+					midiFile->read4(); // Chunk title
+					*lenghtOfChunk = *midiFile->read4();
+					*byteCounter += *lenghtOfChunk + 8;
+				}
+			}
+		
+		runOtherTracks(midiTracks, midiFile);
 		midiOutClose(*toSendInterface);
+}
+
+
+}
+
+void Play::runOtherTracks(MidiTrack** midiTracks, MidiPiece* midiFile ) {
+	vector <thread*> ts;
+	for (size_t i = 0; i < *midiFile->getNtrks() - 2; i++) {
+		thread* t = new thread(&MidiTrack::start, midiTracks[i], new uint8_t(i));
+		ts.push_back(t);
+	}
+	for (int i = 0; i < ts.size(); i++) {
+		ts[i]->join();
 	}
 }
 
-void Play::delay(MidiPiece* midiFile, uint8_t* currentDeltaTime, uint8_t* counter) {
-	// For metrical timing
-	if (currentDeltaTime[0] == 0) {
-		cout << "Delta time: 0" << endl;
-		cout << "Calculated sleep : 0" << endl;
-		return;
-	}
-	else if (*midiFile->getFormat() < 128) {
-		
-		uint32_t* deltaTime = new uint32_t(currentDeltaTime[0]);
-		for (int i = 0; i <= *counter; i++) {
-			*deltaTime = (*deltaTime << i * 7) | currentDeltaTime[i];
-			printf("currentDeltaTime[%d] = %d\n", i, currentDeltaTime[i]);
-		}
-		double* t1 = new double(*deltaTime / (double) *midiFile->getDivision());
-		*t1 = *t1 * *midiFile->getMicrosecondsPerQuaterNote();
-		*t1 = *t1 / 1000;
-		uint32_t  test = *t1;
-		cout << "Delta time: " + to_string(*deltaTime) << endl;
-		cout << "Calculated sleep : " + to_string(test) << endl;
-		Sleep(test);
-	}
-}
+
+
