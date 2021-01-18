@@ -85,7 +85,7 @@ void Play::play(MidiPiece* midiFile) {
 				}
 
 				// Calculate delta time
-				currentDeltaTime[0] = *midiFile->read1();a// lenght is fixed - 5;
+				currentDeltaTime[0] = *midiFile->read1();// lenght is fixed - 5;
 
 
 				*currentlyExaminedByte = *midiFile->read1();
@@ -149,15 +149,21 @@ void Play::play(MidiPiece* midiFile) {
 				}
 			}
 			
-			for(int i = 0; i < *midiFile->getNtrks() - 1; i++){
-				midiTracks[i] = new MidiTrack(fileLocation, byteCounter, midiFile->getDivision(), midiFile->getMicrosecondsPerQuaterNote(), toSendInterface);
-				for (int y = 0; y < *lenghtOfChunk; y++) {
-					midiFile->read1();
-				}
-				if (i != *midiFile->getNtrks() - 2) {
-					midiFile->read4(); // Chunk title
-					*lenghtOfChunk = *midiFile->read4();
-					*byteCounter += *lenghtOfChunk + 8;
+			if (*midiFile->getNtrks() == 2) {
+				*byteCounter = *byteCounter - *lenghtOfChunk - 8;
+				midiTracks[0] = new MidiTrack(fileLocation, byteCounter, midiFile->getDivision(), midiFile->getMicrosecondsPerQuaterNote(), toSendInterface);
+			}
+			else {
+				for (int i = 0; i < *midiFile->getNtrks() - 1; i++) {
+					midiTracks[i] = new MidiTrack(fileLocation, byteCounter, midiFile->getDivision(), midiFile->getMicrosecondsPerQuaterNote(), toSendInterface);
+					for (int y = 0; y < *lenghtOfChunk; y++) {
+						midiFile->read1();
+					}
+					if (i != *midiFile->getNtrks() - 2) {
+						midiFile->read4(); // Chunk title
+						*lenghtOfChunk = *midiFile->read4();
+						*byteCounter += *lenghtOfChunk + 8;
+					}
 				}
 			}
 		
