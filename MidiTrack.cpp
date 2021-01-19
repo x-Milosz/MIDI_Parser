@@ -7,11 +7,10 @@
 #include "MidiSpecificEnums.h"
 using namespace std;
 
-MidiTrack::MidiTrack(string* fileName, uint32_t* trackStartByte, uint16_t* division, uint32_t* microsecondsPerQuarterNote, HMIDIOUT* toSendInterface) {
+MidiTrack::MidiTrack(string* fileName, uint32_t* trackStartByte, MidiPiece* midi, HMIDIOUT* toSendInterface) {
 	this->trackStartByte = new uint32_t(*trackStartByte);
 	this->trackStrem = new ifstream(*fileName, ios::in | ios::binary);
-	this->division = division;
-	this->microsecondsPerQuarterNote = microsecondsPerQuarterNote;
+	this->midi = midi;
 	this->toSendInterface = toSendInterface;
 }
 
@@ -26,8 +25,6 @@ void MidiTrack::start(uint8_t* threadNumber) {
 	bool* isTrackOver = new bool(false);
 
 	uint8_t* currentlyExaminedByte = new uint8_t;
-	uint8_t* currentDeltaTime = new uint8_t[4];
-	uint8_t* counter = new uint8_t;
 
 	uint32_t* msg = new uint32_t(0);
 	uint32_t* tmp = new uint32_t();
@@ -35,16 +32,7 @@ void MidiTrack::start(uint8_t* threadNumber) {
 	read4();
 	while (!*isTrackOver) {
 
-		currentDeltaTime[0] = *read1();
-		*counter = 0;
-		while (currentDeltaTime[*counter] >= 128) {
-			currentDeltaTime[*counter] = currentDeltaTime[*counter] - 128;
-			if (*counter < 4) {
-				*counter += 1;
-				currentDeltaTime[*counter] = *read1();
-			}
-		}
-		delay(currentDeltaTime, counter);
+		readDeltaTime();
 
 		*currentlyExaminedByte = *read1();
 
@@ -54,6 +42,17 @@ void MidiTrack::start(uint8_t* threadNumber) {
 			if (*currentlyExaminedByte == endOfTrack) {
 				read1();
 				*isTrackOver = true;
+			}
+			else if (*currentlyExaminedByte == setTempo) {
+				// lenght is fixed - 3
+				midi->read1();
+				uint32_t* microsecondsPerQuarterNote = new uint32_t(0);
+				uint16_t* first2Bytes = new uint16_t(*midi->read2());
+				uint8_t* secondByte = new uint8_t(*midi->read1());
+				*microsecondsPerQuarterNote = *first2Bytes;
+				*microsecondsPerQuarterNote = (*microsecondsPerQuarterNote << 8) | *secondByte;
+				midi->setMicrosecnodsPerQuaterNote(microsecondsPerQuarterNote);
+				delete(first2Bytes, secondByte);
 			}
 			else {
 				// represents other, unimplemented meta events
@@ -102,18 +101,32 @@ uint32_t* MidiTrack::read4() {
 	return result;
 }
 
-void MidiTrack::delay(uint8_t* currentDeltaTime, uint8_t* counter) {
+void MidiTrack::readDeltaTime() {
+	uint8_t* currentDeltaTime = new uint8_t[4];
+	currentDeltaTime[0] = *read1();
+	uint8_t counter = 0;
+	while (currentDeltaTime[counter] >= 128) {
+		currentDeltaTime[counter] = currentDeltaTime[counter] - 128;
+		if (counter < 4) {
+			counter += 1;
+			currentDeltaTime[counter] = *read1();
+		}
+	}
+	applyDelay(currentDeltaTime, counter);
+}
+
+void MidiTrack::applyDelay(uint8_t* currentDeltaTime, uint8_t counter) {
 	// For metrical timing
 	if (currentDeltaTime[0] == 0) {
 		return;
 	}
 	else  {
 		uint32_t* deltaTime = new uint32_t(currentDeltaTime[0]);
-		for (int i = 0; i <= *counter; i++) {
+		for (int i = 0; i <= counter; i++) {
 			*deltaTime = (*deltaTime << i * 7) | currentDeltaTime[i];
 		}
-		double* t1 = new double(*deltaTime / (double)*division);
-		*t1 = *t1 * *microsecondsPerQuarterNote;
+		double* t1 = new double(*deltaTime / (double)*midi->getDivision());
+		*t1 = *t1 * *midi->getMicrosecondsPerQuaterNote();
 		*t1 = *t1 / 1000;
 		uint32_t* properInt = new uint32_t(*t1);
 		Sleep(*properInt);

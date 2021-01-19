@@ -123,11 +123,11 @@ void Play::play(MidiPiece* midi) {
 			
 		if (*midi->getNtrks() == 2) {
 			*byteCounter = *byteCounter - *lenghtOfChunk - 8;
-			midiTracks[0] = new MidiTrack(fileLocation, byteCounter, midi->getDivision(), midi->getMicrosecondsPerQuaterNote(), midi->getToSendInterface());
+			midiTracks[0] = new MidiTrack(fileLocation, byteCounter, midi, midi->getToSendInterface());
 		}
 		else {
 			for (int i = 0; i < *midi->getNtrks() - 1; i++) {
-				midiTracks[i] = new MidiTrack(fileLocation, byteCounter, midi->getDivision(), midi->getMicrosecondsPerQuaterNote(), midi->getToSendInterface());
+				midiTracks[i] = new MidiTrack(fileLocation, byteCounter, midi, midi->getToSendInterface());
 				for (int y = 0; y < *lenghtOfChunk; y++) {
 					midi->read1();
 				}
