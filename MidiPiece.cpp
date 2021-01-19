@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "MidiPiece.h"
+#include "windows.h"
 using namespace std;
 
 MidiPiece::MidiPiece(string* fileName) {
@@ -11,6 +12,7 @@ MidiPiece::MidiPiece(string* fileName) {
 	this->microsecondsPerQuarterNote = new uint32_t(700000);
 	this->timeSignaure = new TimeSignature(new uint8_t(4), new uint8_t(2), new uint8_t(0), new uint8_t(0));
 	this->smpteOffset = nullptr;
+	this->toSendInterface = new HMIDIOUT;
 }
 
  MidiPiece::~MidiPiece() {
@@ -46,6 +48,10 @@ void MidiPiece::setSmpteOffset(SmpteOffset* newSmpteOffset) {
 	this->smpteOffset = newSmpteOffset;
 }
 
+void MidiPiece::setToSendInterface(HMIDIOUT* newToSendInterface) {
+	this->toSendInterface = newToSendInterface;
+}
+
 ifstream* MidiPiece::getStream() {
 	return stream;
 }
@@ -72,6 +78,10 @@ TimeSignature* MidiPiece::getTimeSignature() {
 
 SmpteOffset* MidiPiece::getSmpteOffset() {
 	return smpteOffset;
+}
+
+HMIDIOUT* MidiPiece::getToSendInterface() {
+	return toSendInterface;
 }
 
 uint8_t* MidiPiece::read1() {

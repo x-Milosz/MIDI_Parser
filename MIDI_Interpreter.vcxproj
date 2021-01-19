@@ -149,6 +149,7 @@
     <ClCompile Include="Play.cpp" />
     <ClCompile Include="SmpteOffset.cpp" />
     <ClCompile Include="TimeSignature.cpp" />
+    <ClCompile Include="Validator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CliInitializator.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SmpteOffset.h" />
     <ClInclude Include="TimeSignature.h" />
+    <ClInclude Include="Validator.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MIDI_Parser.rc" />

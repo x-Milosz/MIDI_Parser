@@ -21,9 +21,7 @@ MidiTrack::MidiTrack() {
 void MidiTrack::start(uint8_t* threadNumber) {
 	printf("Thread number %d is on.\n", *threadNumber);
 	
-	for (int i = 0; i < *trackStartByte; i++) {
-		read1();
-	}
+	trackStrem->seekg(*trackStartByte); 
 
 	bool* isTrackOver = new bool(false);
 

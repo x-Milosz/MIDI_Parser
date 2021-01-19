@@ -51,6 +51,9 @@
     <ClCompile Include="MidiTrack.cpp">
       <Filter>Pliki źródłowe\Play command</Filter>
     </ClCompile>
+    <ClCompile Include="Validator.cpp">
+      <Filter>Pliki źródłowe\Play command</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -78,6 +81,9 @@
       <Filter>Pliki nagłówkowe\Play command</Filter>
     </ClInclude>
     <ClInclude Include="MidiTrack.h">
+      <Filter>Pliki nagłówkowe\Play command</Filter>
+    </ClInclude>
+    <ClInclude Include="Validator.h">
       <Filter>Pliki nagłówkowe\Play command</Filter>
     </ClInclude>
   </ItemGroup>
